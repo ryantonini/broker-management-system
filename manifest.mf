@@ -1,4 +1,6 @@
 Manifest-Version: 1.0
 X-COMMENT: Main-Class will be added automatically by build
 
+Class-Path: lib/mysql-connector-java-5.136-bin.jar 
+
 SplashScreen-Image: rt/brokerage/view/images/brokerage_bk.jpg
