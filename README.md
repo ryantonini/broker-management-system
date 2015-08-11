@@ -20,9 +20,9 @@ or download the zip file.  Change to your project folder where pom.xml file is p
 
     mvn package
 
-After installation, run the following python script in your project files directory:
+You can run the newly compiled and packaged JAR with the following command:
 
-    python load_data.py
+    java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
     
 The script will create a SQLite database file in the current working directory loaded with data from http://www.gamefaqs.com/.
 
