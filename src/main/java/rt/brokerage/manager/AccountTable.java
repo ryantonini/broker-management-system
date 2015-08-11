@@ -25,7 +25,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * This class is used to interact with the Account table in the database.
+ * 
+ * It provides functionality to add tuples to the table, update tuple information,
+ * and get tuples from the table.
+ * 
  * @author ryantonini
  */
 
