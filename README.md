@@ -22,7 +22,7 @@ or download the zip file.  Change to your project folder where pom.xml file is p
 
 You can run the newly compiled and packaged JAR with the following command:
 
-    java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
+    java -cp target/BrokerSystem-1.0-SNAPSHOT.jar com.mycompany.app.App
     
 The script will create a SQLite database file in the current working directory loaded with data from http://www.gamefaqs.com/.
 
