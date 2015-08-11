@@ -3,17 +3,22 @@ Broker Management System
 
 A simple broker management system built from the Java Swing framework.  The system provides tools for the individual broker to manage client and account details, perform client transactions, view market data, monitor client portfolios, and other key functionalities.  
 
-Requirements
+Getting Started
 ------------
 
-GameFaqsPY is conveniently available via pip:
+###### Prerequisites:
 
-    pip install gamefaqs-py
+* Java 1.7
+* MySQL (Community Server)
+* Maven 3.3.3 (alternatively you could use Netbeans IDE)
 
-or installable via ``git clone`` and ``setup.py``
+Clone the repository to your system locally via ``git clone``:
 
-    git clone git@github.com:ryantonini/gamefaqs-py.git
-    sudo python setup.py install
+    git clone git@github.com:ryantonini/broker-management-system.git
+
+or download the zip file.  Change to your project folder where pom.xml file is placed, and issue this command:
+
+    mvn package
 
 After installation, run the following python script in your project files directory:
 
