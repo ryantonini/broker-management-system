@@ -14,7 +14,7 @@ Getting Started
 
 Clone the repository to your system locally via ``git clone``:
 
-    git clone git@github.com:ryantonini/broker-management-system.git
+    git clone https://github.com/ryantonini/broker-management-system.git
 
 or download the zip file.  Change to your project folder where pom.xml file is placed, and issue this command:
 
