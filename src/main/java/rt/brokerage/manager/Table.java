@@ -24,14 +24,14 @@ import java.sql.SQLException;
  * Base table.  
  * 
  * @author ryantonini
- * @param <T>
+ * @param <T> parameters for the specific table
  */
 public abstract class Table<T> {
     
     protected Connection con;
     
     /**
-     * @param con
+     * @param con connection to the database
      */
     public Table(Connection con) {
         this.con = con;
@@ -40,8 +40,8 @@ public abstract class Table<T> {
     /**
      * Add tuple to table.
      * 
-     * @param t
-     * @return
+     * @param t tuple to be added
+     * @return either 0 or last auto_increment value
      * @throws SQLException
      */
     public abstract int add(T t) throws SQLException;
