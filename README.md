@@ -33,6 +33,4 @@ Alternatively, you can open the maven project from NetBeans IDE as follows:
 
 Licensing
 ------------
-Before you can run the application, you will have to change the database configuration settings in the src/resources/db.properties file.  Use the settings for your MySQL version.  The included values are just a sample.   
-#### Licensing 
 Please see the file called LICENSE.
