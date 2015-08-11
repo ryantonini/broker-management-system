@@ -24,7 +24,7 @@ You can run the newly compiled and packaged JAR with the following command:
 
     java -cp target/BrokerSystem-1.0-SNAPSHOT-jar-with-dependencies.jar rt.brokerage.view.BrokerageUI
     
-Alternatively, you can open the maven project from the NetBeans IDE (hasn't been tested on Eclipse and IntelliJ).  From there, you can `Build Project` to generate the necessary jar files or `Run` the `BrokerageUI.java` file to launch the application immediately. 
+Alternatively, you can open the maven project from the NetBeans IDE (hasn't been tested on Eclipse and IntelliJ).  From there, you can `Build Project` to generate the necessary jar files or run the `BrokerageUI.java` file to launch the application immediately. 
 
 <b>NOTE:</b> Before you can run the application, you will have to change the database configuration variables in `src/resources/db.properties` using the settings for your local MySQL version.
 
