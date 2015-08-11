@@ -21,7 +21,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- *
+ * Base table.  
+ * 
  * @author ryantonini
  * @param <T>
  */
@@ -30,7 +31,6 @@ public abstract class Table<T> {
     protected Connection con;
     
     /**
-     *
      * @param con
      */
     public Table(Connection con) {
@@ -38,7 +38,8 @@ public abstract class Table<T> {
     }
     
     /**
-     *
+     * Add tuple to table.
+     * 
      * @param t
      * @return
      * @throws SQLException
