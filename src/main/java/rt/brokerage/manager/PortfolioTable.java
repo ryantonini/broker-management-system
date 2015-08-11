@@ -27,7 +27,8 @@ import java.util.logging.Logger;
 import rt.brokerage.quote.StockLookup;
 
 /**
- *
+ * This class is used to interact with the Portfolio table in the database.
+ * 
  * @author ryantonini
  */
 
