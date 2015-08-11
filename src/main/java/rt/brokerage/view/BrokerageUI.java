@@ -141,6 +141,7 @@ public class BrokerageUI extends javax.swing.JFrame {
         defaultPanel = new javax.swing.JPanel();
         jLabel34 = new javax.swing.JLabel();
         jLabel37 = new javax.swing.JLabel();
+        jLabel40 = new javax.swing.JLabel();
         addPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -170,6 +171,7 @@ public class BrokerageUI extends javax.swing.JFrame {
         investmentTextField = new javax.swing.JTextField();
         jLabel36 = new javax.swing.JLabel();
         numOwnersTextField = new javax.swing.JTextField();
+        cancelButton = new javax.swing.JButton();
         portfolioPanel = new javax.swing.JPanel();
         jLabel22 = new javax.swing.JLabel();
         searchAccountTextField = new javax.swing.JTextField();
@@ -337,15 +339,18 @@ public class BrokerageUI extends javax.swing.JFrame {
         mainPanel.setPreferredSize(new java.awt.Dimension(666, 403));
         mainPanel.setLayout(new java.awt.CardLayout());
 
-        defaultPanel.setBackground(new java.awt.Color(204, 204, 204));
+        defaultPanel.setBackground(new java.awt.Color(212, 215, 226));
         defaultPanel.setForeground(new java.awt.Color(51, 0, 255));
         defaultPanel.setPreferredSize(new java.awt.Dimension(666, 403));
 
-        jLabel34.setFont(new java.awt.Font("Lucida Grande", 2, 24)); // NOI18N
+        jLabel34.setFont(new java.awt.Font("Lucida Grande", 1, 24)); // NOI18N
         jLabel34.setText("Welcome");
 
         jLabel37.setBackground(new java.awt.Color(50, 40, 25));
-        jLabel37.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/welcome.jpg"))); // NOI18N
+        jLabel37.setForeground(new java.awt.Color(0, 0, 255));
+        jLabel37.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/brokerage_bk.jpg"))); // NOI18N
+
+        jLabel40.setText("Copyright (C) 2015  Ryan Tonini");
 
         javax.swing.GroupLayout defaultPanelLayout = new javax.swing.GroupLayout(defaultPanel);
         defaultPanel.setLayout(defaultPanelLayout);
@@ -354,8 +359,9 @@ public class BrokerageUI extends javax.swing.JFrame {
             .addGroup(defaultPanelLayout.createSequentialGroup()
                 .addGap(45, 45, 45)
                 .addGroup(defaultPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel37))
+                    .addComponent(jLabel37)
+                    .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         defaultPanelLayout.setVerticalGroup(
@@ -363,9 +369,11 @@ public class BrokerageUI extends javax.swing.JFrame {
             .addGroup(defaultPanelLayout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(28, 28, 28)
                 .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(133, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel40)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         mainPanel.add(defaultPanel, "card7");
@@ -429,6 +437,15 @@ public class BrokerageUI extends javax.swing.JFrame {
 
         jLabel36.setText("Number of Owners");
 
+        cancelButton.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        cancelButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/cancel.png"))); // NOI18N
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout addPanelLayout = new javax.swing.GroupLayout(addPanel);
         addPanel.setLayout(addPanelLayout);
         addPanelLayout.setHorizontalGroup(
@@ -458,10 +475,15 @@ public class BrokerageUI extends javax.swing.JFrame {
                                         .addComponent(lastNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(addPanelLayout.createSequentialGroup()
                                         .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(addressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(stateBox, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(phoneTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGap(18, 18, 18)
+                                            .addGroup(addPanelLayout.createSequentialGroup()
+                                                .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(addressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(stateBox, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(phoneTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGap(18, 18, 18))
+                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addPanelLayout.createSequentialGroup()
+                                                .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(5, 5, 5)))
                                         .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addGroup(addPanelLayout.createSequentialGroup()
                                                 .addComponent(jLabel7)
@@ -545,8 +567,10 @@ public class BrokerageUI extends javax.swing.JFrame {
                         .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(emailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(30, 30, 30)
-                .addComponent(newAccountButton)
-                .addContainerGap(173, Short.MAX_VALUE))
+                .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(newAccountButton)
+                    .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         mainPanel.add(addPanel, "card2");
@@ -689,7 +713,7 @@ public class BrokerageUI extends javax.swing.JFrame {
         portfolioPanel.setLayout(portfolioPanelLayout);
         portfolioPanelLayout.setHorizontalGroup(
             portfolioPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(portfolioInfoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 666, Short.MAX_VALUE)
+            .addComponent(portfolioInfoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 682, Short.MAX_VALUE)
             .addGroup(portfolioPanelLayout.createSequentialGroup()
                 .addGap(125, 125, 125)
                 .addComponent(jLabel22)
@@ -910,6 +934,7 @@ public class BrokerageUI extends javax.swing.JFrame {
 
         newTypeButton.setForeground(new java.awt.Color(51, 0, 204));
         newTypeButton.setText("Add");
+        newTypeButton.setToolTipText("Add New Account Type");
         newTypeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newTypeButtonActionPerformed(evt);
@@ -1009,6 +1034,7 @@ public class BrokerageUI extends javax.swing.JFrame {
 
         updateTypesButton.setForeground(new java.awt.Color(51, 0, 255));
         updateTypesButton.setText("Update");
+        updateTypesButton.setToolTipText("Display Account Types");
         updateTypesButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateTypesButtonActionPerformed(evt);
@@ -1055,6 +1081,7 @@ public class BrokerageUI extends javax.swing.JFrame {
 
         closeAccountButton.setForeground(new java.awt.Color(51, 0, 204));
         closeAccountButton.setText("Close Account");
+        closeAccountButton.setToolTipText("Close Account");
         closeAccountButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 closeAccountButtonActionPerformed(evt);
@@ -1616,6 +1643,25 @@ public class BrokerageUI extends javax.swing.JFrame {
         accountValueTextField.setText(String.valueOf(newAccountValue));
     }//GEN-LAST:event_addAmountButtonActionPerformed
 
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        
+        /* reset to default values */
+        firstNameTextField.setText("");
+        lastNameTextField.setText("");
+        addressTextField.setText("");
+        cityTextField.setText("");
+        zipTextField.setText("");
+        ssnTextField.setText("");
+        phoneTextField.setText("");
+        emailTextField.setText("");
+        stateBox.setSelectedIndex(0);
+        countryBox.setSelectedIndex(0);
+        investmentTextField.setText("");
+        selectAccountTypeBox.setSelectedIndex(0);
+        numOwnersTextField.setText("");
+        
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1670,6 +1716,7 @@ public class BrokerageUI extends javax.swing.JFrame {
     private javax.swing.JTextField addressTextField;
     private javax.swing.JTextField amountTextField;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton cancelButton;
     private javax.swing.JTextField cashTextField;
     private javax.swing.JTextField cityTextField;
     private javax.swing.JButton closeAccountButton;
@@ -1720,6 +1767,7 @@ public class BrokerageUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
