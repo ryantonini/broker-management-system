@@ -29,7 +29,7 @@ Alternatively, you can open the maven project from NetBeans IDE as follows:
     File -> Import Project -> From Zip 
 
 
-```NOTE:``` Before you can run the application, you will have to change the database configuration settings in `src/resources/db.properties` using the settings for your local MySQL version.
+<b>NOTE:</b> Before you can run the application, you will have to change the database configuration settings in `src/resources/db.properties` using the settings for your local MySQL version.
 
 Licensing
 ------------
