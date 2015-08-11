@@ -27,7 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * This class is used to interact with the Quote table in the database.
+ * 
  * @author ryantonini
  */
 
