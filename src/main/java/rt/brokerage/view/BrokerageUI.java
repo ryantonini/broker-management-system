@@ -20,62 +20,41 @@ package rt.brokerage.view;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.swing.table.DefaultTableModel;
-
-import rt.brokerage.main.Connector;
-import rt.brokerage.main.AccountItem;
-import rt.brokerage.main.AccountTable;
-import rt.brokerage.main.AccountManagerItem;
-import rt.brokerage.main.AccountManagerTable;
-import rt.brokerage.main.AccountTypeItem;
-import rt.brokerage.main.AccountTypeTable;
-import rt.brokerage.main.ClientItem;
-import rt.brokerage.main.ClientTable;
-import rt.brokerage.main.PortfolioTable;
-import rt.brokerage.main.QuoteTable;
-import rt.brokerage.main.TransactionTable;
-import rt.brokerage.main.QuoteItem;
-import rt.brokerage.quote.StockLookup;
-import rt.brokerage.main.PortfolioItem;
-import rt.brokerage.main.TransactionItem;
-import rt.brokerage.main.DatabaseResource;
-
+import rt.brokerage.manager.AccountItem;
+import rt.brokerage.manager.AccountTypeItem;
+import rt.brokerage.manager.ClientItem;
+import rt.brokerage.manager.QuoteItem;
+import rt.brokerage.manager.PortfolioItem;
+import rt.brokerage.manager.DbResource;
+import rt.brokerage.manager.QueryFunctions;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
+
 /**
- * Runs the application and generates the UI along with all necessary database 
- * requirements. 
+ * Runs the application and generates the UI.
  * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
 
 public class BrokerageUI extends javax.swing.JFrame {
         
-    private final static int numOfTables = 7;
+    private static final int NUMTABLES = 7;
     private static boolean jointStatus = false; // for creating joint accounts
     private int accountOwners = 0;  
     private int acctNoHolder = 0;
-    private boolean state = true; // for loading accounttypes in combobox
-    private DatabaseResource dbResource = new DatabaseResource();
-    
+    private boolean state = true; // for loading account types in combobox
+    private QueryFunctions qf;
+    private DbResource dbResource;
     private Connection con;
-    private AccountTable accountTable;
-    private ClientTable clientTable;
-    private AccountManagerTable managerTable;
-    private AccountTypeTable typeTable;
-    private PortfolioTable portfolioTable;
-    private QuoteTable quoteTable;
-    private TransactionTable transTable;
-
+    
     /**
      * Creates new form BrokerageUI
      */
@@ -97,26 +76,20 @@ public class BrokerageUI extends javax.swing.JFrame {
         String dbms = props.getProperty("dbms");
         String dbName = props.getProperty("dbname");
      
-        Connector c = new Connector(username, password, host, portNumber,
+        dbResource = new DbResource(username, password, host, portNumber,
                                      dbms, dbName);
         try {
-            con = c.connect();
+            con = dbResource.connect();
             DatabaseMetaData md = con.getMetaData();
             ResultSet rs = md.getTables(null, null, "%", null);
             int tableCount = 0;
             while (rs.next()) {
                 tableCount += 1;
             }
-            if (tableCount != numOfTables) {
+            if (tableCount != NUMTABLES) {
                 dbResource.populate(con);
             }
-            accountTable = new AccountTable(con);
-            clientTable = new ClientTable(con);
-            managerTable = new AccountManagerTable(con);
-            typeTable = new AccountTypeTable(con);
-            portfolioTable = new PortfolioTable(con);
-            quoteTable = new QuoteTable(con);
-            transTable = new TransactionTable(con);
+            qf = new QueryFunctions(con);
         } catch (SQLException ex) {
             Logger.getLogger(BrokerageUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -131,6 +104,7 @@ public class BrokerageUI extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        jDialog1 = new javax.swing.JDialog();
         jToolBar1 = new javax.swing.JToolBar();
         addButton = new javax.swing.JButton();
         viewPortfolioButton = new javax.swing.JButton();
@@ -237,6 +211,17 @@ public class BrokerageUI extends javax.swing.JFrame {
         accountTypeTable = new javax.swing.JTable();
         updateTypesButton = new javax.swing.JButton();
         jLabel38 = new javax.swing.JLabel();
+        viewUserAccounts = new javax.swing.JPanel();
+        jLabel41 = new javax.swing.JLabel();
+        firstNameSearchTextField = new javax.swing.JTextField();
+        jLabel42 = new javax.swing.JLabel();
+        lastNameSearch = new javax.swing.JLabel();
+        lastNameSearchTextField = new javax.swing.JTextField();
+        searchUserButton = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        userAccountTable = new javax.swing.JTable();
+        refreshButton = new javax.swing.JButton();
         closeAccountPanel = new javax.swing.JPanel();
         jLabel27 = new javax.swing.JLabel();
         closeAccountNumberTextField = new javax.swing.JTextField();
@@ -245,6 +230,17 @@ public class BrokerageUI extends javax.swing.JFrame {
         fileMenu = new javax.swing.JMenu();
         exitMenuItem = new javax.swing.JMenuItem();
         toolsMenu = new javax.swing.JMenu();
+
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Broker Management System v1.0");
@@ -367,13 +363,13 @@ public class BrokerageUI extends javax.swing.JFrame {
         defaultPanelLayout.setVerticalGroup(
             defaultPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(defaultPanelLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
+                .addGap(52, 52, 52)
                 .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel40)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(158, Short.MAX_VALUE))
         );
 
         mainPanel.add(defaultPanel, "card7");
@@ -395,11 +391,6 @@ public class BrokerageUI extends javax.swing.JFrame {
         jLabel7.setText("Email");
 
         selectAccountTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select" }));
-        selectAccountTypeBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                selectAccountTypeBoxActionPerformed(evt);
-            }
-        });
 
         jLabel9.setText("Address");
 
@@ -407,22 +398,11 @@ public class BrokerageUI extends javax.swing.JFrame {
 
         jLabel8.setText("Zip/PC");
 
-        zipTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                zipTextFieldActionPerformed(evt);
-            }
-        });
-
         jLabel11.setText("State/Prov.");
 
         jLabel12.setText("Country");
 
         countryBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select", "United States", "Canada" }));
-        countryBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                countryBoxActionPerformed(evt);
-            }
-        });
 
         newAccountButton.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         newAccountButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/submitadd.png"))); // NOI18N
@@ -580,12 +560,6 @@ public class BrokerageUI extends javax.swing.JFrame {
 
         jLabel22.setText("Enter Account Number");
 
-        searchAccountTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                searchAccountTextFieldActionPerformed(evt);
-            }
-        });
-
         viewPortfolioSearchButton.setForeground(new java.awt.Color(0, 0, 204));
         viewPortfolioSearchButton.setText("View Portfolio");
         viewPortfolioSearchButton.addActionListener(new java.awt.event.ActionListener() {
@@ -607,12 +581,6 @@ public class BrokerageUI extends javax.swing.JFrame {
 
         jLabel32.setText("Date Opened");
 
-        dateOpenTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dateOpenTextFieldActionPerformed(evt);
-            }
-        });
-
         stockPortfolioTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
@@ -630,6 +598,7 @@ public class BrokerageUI extends javax.swing.JFrame {
         jLabel33.setForeground(new java.awt.Color(51, 0, 204));
         jLabel33.setText("Stock Portfolio");
 
+        addAmountButton.setForeground(new java.awt.Color(51, 0, 255));
         addAmountButton.setText("Add To Account");
         addAmountButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -831,7 +800,7 @@ public class BrokerageUI extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Ticker", "Company", "Last Trade", "Time", "Date", "Change", "Open", "Prev ", "Volume"
+                "Ticker", "Exchange", "Last Trade", "Time", "Date", "Change", "% Change", "Prev "
             }
         ));
         jScrollPane1.setViewportView(watchListTable);
@@ -896,7 +865,7 @@ public class BrokerageUI extends javax.swing.JFrame {
                     .addComponent(tickerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(addTickerButton)
                     .addComponent(updateMarketButton))
-                .addGap(194, 194, 194))
+                .addGap(142, 142, 142))
         );
 
         mainPanel.add(marketPanel, "card2");
@@ -922,12 +891,6 @@ public class BrokerageUI extends javax.swing.JFrame {
         jScrollPane2.setViewportView(descrTextArea);
 
         ownershipBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select", "Individual", "Joint-JTWROS" }));
-
-        maintenanceTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                maintenanceTextFieldActionPerformed(evt);
-            }
-        });
 
         periodBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select", "Yearly ", "Semiannually", "Quarterly", "Monthly", "None" }));
         periodBox.setToolTipText("Period to which maintenance fees are charged.  ");
@@ -1027,7 +990,7 @@ public class BrokerageUI extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "Ownership", "Description", "Min Invest ", "Commission ", "Maintenance ", "Period"
+                "Name", "Ownership", "Description", "Min Invest, $", "Commission, $ ", "Maintenance, $", "Period"
             }
         ));
         jScrollPane4.setViewportView(accountTypeTable);
@@ -1051,15 +1014,15 @@ public class BrokerageUI extends javax.swing.JFrame {
             viewAccountTypesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(viewAccountTypesPanelLayout.createSequentialGroup()
                 .addGroup(viewAccountTypesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(viewAccountTypesPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(updateTypesButton))
-                    .addGroup(viewAccountTypesPanelLayout.createSequentialGroup()
-                        .addGap(15, 15, 15)
                         .addGroup(viewAccountTypesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel38)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(viewAccountTypesPanelLayout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addComponent(jLabel38))
+                            .addComponent(updateTypesButton))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         viewAccountTypesPanelLayout.setVerticalGroup(
             viewAccountTypesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1074,6 +1037,92 @@ public class BrokerageUI extends javax.swing.JFrame {
         );
 
         viewAccountType.addTab("View Account Types", viewAccountTypesPanel);
+
+        jLabel41.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel41.setText("User Accounts");
+
+        jLabel42.setText("First Name");
+
+        lastNameSearch.setText("Last Name");
+
+        searchUserButton.setForeground(new java.awt.Color(51, 0, 255));
+        searchUserButton.setText("Search User");
+        searchUserButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchUserButtonActionPerformed(evt);
+            }
+        });
+
+        userAccountTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "AcctNo", "Account Type", "Open Date", "Cash, $", "Total Value, $"
+            }
+        ));
+        jScrollPane5.setViewportView(userAccountTable);
+
+        refreshButton.setForeground(new java.awt.Color(51, 0, 255));
+        refreshButton.setText("Refresh");
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout viewUserAccountsLayout = new javax.swing.GroupLayout(viewUserAccounts);
+        viewUserAccounts.setLayout(viewUserAccountsLayout);
+        viewUserAccountsLayout.setHorizontalGroup(
+            viewUserAccountsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(viewUserAccountsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(viewUserAccountsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(viewUserAccountsLayout.createSequentialGroup()
+                        .addComponent(jSeparator1)
+                        .addContainerGap())
+                    .addGroup(viewUserAccountsLayout.createSequentialGroup()
+                        .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(viewUserAccountsLayout.createSequentialGroup()
+                        .addComponent(jLabel42)
+                        .addGap(18, 18, 18)
+                        .addComponent(firstNameSearchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lastNameSearch)
+                        .addGap(18, 18, 18)
+                        .addComponent(lastNameSearchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(searchUserButton)
+                        .addGap(56, 56, 56))
+                    .addGroup(viewUserAccountsLayout.createSequentialGroup()
+                        .addGroup(viewUserAccountsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(refreshButton)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 613, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        viewUserAccountsLayout.setVerticalGroup(
+            viewUserAccountsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(viewUserAccountsLayout.createSequentialGroup()
+                .addGap(39, 39, 39)
+                .addGroup(viewUserAccountsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(firstNameSearchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel42)
+                    .addComponent(lastNameSearch)
+                    .addComponent(lastNameSearchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(searchUserButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(refreshButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        viewAccountType.addTab("View User Accounts", viewUserAccounts);
 
         jLabel27.setText("Enter Account Number");
 
@@ -1183,7 +1232,7 @@ public class BrokerageUI extends javax.swing.JFrame {
         mainPanel.revalidate();
 
         if (state) {
-            ArrayList<AccountTypeItem> types = typeTable.getInfo();
+            List<AccountTypeItem> types = qf.getAccountTypes();
             if (!types.isEmpty()) {
                 for (AccountTypeItem type : types) {
                     selectAccountTypeBox.addItem(type.getName());
@@ -1232,8 +1281,6 @@ public class BrokerageUI extends javax.swing.JFrame {
         mainPanel.add(marketPanel);
         mainPanel.repaint();
         mainPanel.revalidate();
-
-
     }//GEN-LAST:event_marketButtonActionPerformed
 
     private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
@@ -1258,102 +1305,32 @@ public class BrokerageUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
-    private void zipTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zipTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_zipTextFieldActionPerformed
-
-    private void countryBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_countryBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_countryBoxActionPerformed
-
     private void submitTradeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitTradeButtonActionPerformed
 
-        /* read from text fields and combobox */
+        /* read from text fields and combo box */
         int acctNo = Integer.parseInt(tradeAccountNumberTextField.getText());
         String ticker = tradeSymbolTextField.getText();
         String type = (String) tradeBox.getSelectedItem();
         int qty = Integer.parseInt(tradeQtyTextField.getText());
         String price = (String) tradePriceBox.getSelectedItem();
 
-        /* get current date of transaction in same format as sql date */
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String tradeDate = sdf.format(date);
-
-        /* get most recent price info for ticker */
-        StockLookup lookup = new StockLookup();
-        double currentPrice = lookup.getStockInfo(ticker).getLastTrade();
-        double purchasePrice = currentPrice; //at buy time, purchase=current
-        double totalValue = qty * currentPrice;
-        double net = 0; //at buy time, no gain/loss
-
-        /* get value, cash and commission of account */
-        AccountItem data = accountTable.getInfo(acctNo);
-        AccountTypeItem ati = typeTable.getInfo(acctNo);
-        double accountValue = data.getTotalValue();
-        double accountCash = data.getCash();
-        double commission = ati.getCommission();
-
-        /* tuple for the record in portfolio before transaction */
-        PortfolioItem oldPort = portfolioTable.getInfo(acctNo, ticker);
-        TransactionItem ti = new TransactionItem(acctNo, ticker, type, qty,
-                price, tradeDate);
-        PortfolioItem newPort = new PortfolioItem(acctNo, ticker, qty, purchasePrice,
-                currentPrice, totalValue, net);
-        AccountItem ai = new AccountItem("", 0, 0, "", "", "");
-
-        try {
-            switch (type) {
-                case "Buy":
-                    if (accountCash >= totalValue + commission) { // ensure sufficient funds are present
-                        /* add to or update already existing tuple in portfolio table */
-                        if (oldPort.getTicker().equals("")) {
-                            portfolioTable.add(newPort);
-                            ai.setTotalValue(accountValue - commission);
-                        } else {
-                            newPort.setQty(qty + oldPort.getQty());
-                            newPort.setTotalValue(currentPrice * newPort.getQty());
-                            newPort.setNet(currentPrice * oldPort.getQty() - oldPort.getTotalValue());
-                            ai.setTotalValue(accountValue + newPort.getNet() - commission); // if price changes
-                            portfolioTable.update(newPort);
-                        }
-                        /* make changes to account table */
-                        ai.setCash(accountCash - totalValue - commission);
-                        accountTable.updateNumericSettings(ai, acctNo);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Buy Transaction Failed: Insufficient Funds");
-                        break;
-                    }
-                    /* add to transactions table */
-                    transTable.add(ti);
-                    break;
-                case "Sell":
-                    if (oldPort.getQty() == qty) {
-                        portfolioTable.delete(acctNo, ticker);
-                    } else if (oldPort.getQty() > qty) {
-                        ai.setCash(accountCash + totalValue);
-                        newPort.setQty(oldPort.getQty() - newPort.getQty());
-                        newPort.setPurchasePrice(oldPort.getPurchasePrice());
-                        newPort.setTotalValue(currentPrice * newPort.getQty());
-                        newPort.setNet(newPort.getTotalValue() - (oldPort.getCurrentPrice() * newPort.getQty()));
-                        portfolioTable.update(newPort);
-                    } else { // more qty than owned
-                        JOptionPane.showMessageDialog(null, "Sell Transaction Failed: Quantity Overload");
-                        break;
-                    }
-                    /* make changes to account table */
-                    double diff = oldPort.getQty() * currentPrice - oldPort.getTotalValue();
-                    ai.setCash(accountCash + totalValue - commission);
-                    ai.setTotalValue(accountValue + diff - commission);
-                    accountTable.updateNumericSettings(ai, acctNo);
-                    /* add to transactions table */
-                    transTable.add(ti);
-                    break;
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(BrokerageUI.class.getName()).log(Level.SEVERE, null, ex);
+        int val = qf.trade(acctNo, ticker, type, qty, price);
+        switch (val) {
+            case 0: 
+                JOptionPane.showMessageDialog(null, "Order Successful");
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(null, "Buy Transaction Failed: Insufficient Funds");
+                break;
+            case 2: 
+                JOptionPane.showMessageDialog(null, "Sell Transaction Failed: Quantity Overload");
+                break;
+            case 3:
+                JOptionPane.showMessageDialog(null, "Market Closed");
+                break;
         }
-
+        
+        /* restore default values */
         tradeAccountNumberTextField.setText("");
         tradeSymbolTextField.setText("");
         tradeBox.setSelectedIndex(0);
@@ -1364,65 +1341,37 @@ public class BrokerageUI extends javax.swing.JFrame {
        
         DefaultTableModel model = (DefaultTableModel) watchListTable.getModel();
         String ticker = tickerTextField.getText();
-        StockLookup lookup = new StockLookup();
-        QuoteItem qi = lookup.getStockInfo(ticker);
+        QuoteItem qi = qf.addQuote(ticker);
+       
+        /* display on market table */
+        model.addRow(new Object[]{qi.getTicker(), qi.getExchange(), qi.getLastTrade(),
+            qi.getTradeTime(), qi.getTradeDate(), qi.getChange(),
+            qi.getPercentChange(), qi.getPrevClose()});
 
-        try {
-            /* insert to db */
-            quoteTable.add(qi);
-            /* display on market table */
-            model.addRow(new Object[]{qi.getTicker(), qi.getName(), qi.getLastTrade(),
-                qi.getTradeTime(), qi.getTradeDate(), qi.getChange(),
-                qi.getOpen(), qi.getPrevClose(), qi.getVolume()});
-        } catch (SQLException ex) {
-            Logger.getLogger(BrokerageUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        /* restore default */
+        /* restore to default */
         tickerTextField.setText("");
     }//GEN-LAST:event_addTickerButtonActionPerformed
 
     private void newAccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newAccountButtonActionPerformed
 
-        int cID;
         String accountType = (String) selectAccountTypeBox.getSelectedItem();
-        ArrayList<AccountTypeItem> types = typeTable.getInfo();
-        double minInvest = 0;
-        String ownership = "";
-        for (AccountTypeItem type : types) {
-            if (type.getName().equals(accountType)) {
-                minInvest = type.getMinInvest();
-                ownership = type.getOwnership();
-            }
-        }
+        Object[] items = qf.getAccountType(accountType);
+        double minInvest = (double) items[0];
+        String ownership = (String) items[1];
 
         if (!jointStatus) {
-            int acctNo;
             int numOwners = Integer.parseInt(numOwnersTextField.getText());
             accountOwners = numOwners;
             double initialInvest = Double.parseDouble(investmentTextField.getText());
-
-            if (initialInvest < minInvest) {
+            
+            int value = qf.addNewAccount(accountType, initialInvest, minInvest);
+            if (value == 0) {
                 investmentTextField.setText("");
-                JOptionPane.showMessageDialog(null, "Error Message:\nInitial Investment Value Does Not Satisfy Account Type Criteria\nAccount Not Created Successfully");
+                JOptionPane.showMessageDialog(null, "Initial Investment Value "
+                        + "Does Not Satisfy Account Type Criteria\nAccount Not Created Successfully");
                 return; // break from method
             }
-
-            String status = "Open";
-            Date dopen = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); // sql format
-            String openDate = sdf.format(dopen);
-
-            AccountItem ai = new AccountItem(accountType, initialInvest, initialInvest,
-                    status, openDate, "");
-
-            try {
-                /* insert into Account Table and return current account number */
-                acctNo = accountTable.add(ai);
-                acctNoHolder = acctNo;
-            } catch (SQLException ex) {
-                Logger.getLogger(BrokerageUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            acctNoHolder = value;
         }
 
         String firstName = firstNameTextField.getText();
@@ -1438,15 +1387,8 @@ public class BrokerageUI extends javax.swing.JFrame {
 
         ClientItem ci = new ClientItem(firstName, lastName, address, city, zip,
                 region, country, ssn, phone, email);
-        try {
-            /* insert data to Client Table and return current clientID */
-            cID = clientTable.add(ci);
-            AccountManagerItem ami = new AccountManagerItem(acctNoHolder, cID);
-            /* insert into AccountManager Table */
-            managerTable.add(ami);
-        } catch (SQLException ex) {
-            Logger.getLogger(BrokerageUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
+        qf.addClientToAccount(acctNoHolder, ci);
 
         /* reset to default values */
         firstNameTextField.setText("");
@@ -1475,42 +1417,24 @@ public class BrokerageUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_newAccountButtonActionPerformed
 
-    private void selectAccountTypeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAccountTypeBoxActionPerformed
-
-    }//GEN-LAST:event_selectAccountTypeBoxActionPerformed
-
     private void updateMarketButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateMarketButtonActionPerformed
 
-        StockLookup lookup = new StockLookup();
         DefaultTableModel model = (DefaultTableModel) watchListTable.getModel();
-        ArrayList<QuoteItem> quoteList = new ArrayList<>();
-        for (String ticker : quoteTable.getTickers()) {
-            quoteList.add(lookup.getStockInfo(ticker));
-        }
         model.setRowCount(0);
+        List<QuoteItem> quoteList = qf.updateMarket();
         for (QuoteItem qi : quoteList) {
-            try {
-                // update quote in db
-                quoteTable.update(qi);
-                // update quote in market watchlist table
-                model.addRow(new Object[]{qi.getTicker(), qi.getName(), qi.getLastTrade(),
-                    qi.getTradeTime(), qi.getTradeDate(), qi.getChange(),
-                    qi.getOpen(), qi.getPrevClose(), qi.getVolume()});
-            } catch (SQLException ex) {
-                Logger.getLogger(BrokerageUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            /* update quote in market watchlist table */
+            model.addRow(new Object[]{qi.getTicker(), qi.getExchange(), qi.getLastTrade(),
+                qi.getTradeTime(), qi.getTradeDate(), qi.getChange(),
+                qi.getPercentChange(), qi.getPrevClose()});
         }
     }//GEN-LAST:event_updateMarketButtonActionPerformed
-
-    private void dateOpenTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dateOpenTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dateOpenTextFieldActionPerformed
 
     private void viewPortfolioSearchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewPortfolioSearchButtonActionPerformed
 
         DefaultTableModel model = (DefaultTableModel) stockPortfolioTable.getModel();
-
         model.setRowCount(0);
+        
         ownerTextField.setText("");
         typeTextField.setText("");
         accountValueTextField.setText("");
@@ -1518,56 +1442,30 @@ public class BrokerageUI extends javax.swing.JFrame {
         dateOpenTextField.setText("");
 
         int acctNo = Integer.parseInt(searchAccountTextField.getText());
-        AccountItem ai = accountTable.getInfo(acctNo);
-        ArrayList<PortfolioItem> piList = portfolioTable.updateAll(acctNo);
-        double totalAsset = 0;
+        Object[] items = qf.updatePortfolio(acctNo);
+        PortfolioItem[] piList = (PortfolioItem[]) items[0];
+        AccountItem[] aiList = (AccountItem[]) items[1];
         for (PortfolioItem pi : piList) {
-            totalAsset += pi.getTotalValue();
             model.addRow(new Object[]{pi.getTicker(), pi.getQty(), pi.getPurchasePrice(),
                 pi.getCurrentPrice(), pi.getTotalValue(), pi.getNet()});
         }
-
-        double newTotalValue = totalAsset + ai.getCash();
-        ai.setTotalValue(newTotalValue);
-        accountTable.updateNumericSettings(ai, acctNo);
-
-        /* add code to check if its valid account number - assume it is for now */
-        ArrayList<ClientItem> clients = clientTable.getInfo(acctNo);
-        String group = "";
-        for (ClientItem client : clients) {
-            String fullName = client.getFirstName() + " " + client.getLastName();
-            group += fullName + ", ";
-        }
-        group = group.substring(0, group.length() - 2); // remove ending comma
-
+        
+        String group = qf.getAccountName(acctNo);
+        AccountItem ai = aiList[0];
         ownerTextField.setText(group);
         typeTextField.setText(ai.getType());
-        accountValueTextField.setText(String.valueOf(newTotalValue));
+        accountValueTextField.setText(String.valueOf(ai.getTotalValue()));
         cashTextField.setText(String.valueOf(ai.getCash()));
         dateOpenTextField.setText(ai.getOpenDate());
 
         portfolioInfoPanel.setVisible(true);
     }//GEN-LAST:event_viewPortfolioSearchButtonActionPerformed
 
-    private void searchAccountTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchAccountTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_searchAccountTextFieldActionPerformed
-
     private void closeAccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeAccountButtonActionPerformed
 
         int acctNo = Integer.parseInt(closeAccountNumberTextField.getText());
-        String status = "Closed";
-
-        Date dclose = new Date();
-        /* same as sql date format */
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String closeDate = sdf.format(dclose);
-
-        AccountItem ai = new AccountItem("", 0, 0, status, "", closeDate);
-        /* update account table in database */
-        accountTable.updateDateSettings(ai, acctNo);
+        qf.closeAccount(acctNo);
         JOptionPane.showMessageDialog(null, "Account Closed Successfully");
-
         /* reset to default values */
         closeAccountNumberTextField.setText("");
     }//GEN-LAST:event_closeAccountButtonActionPerformed
@@ -1575,7 +1473,7 @@ public class BrokerageUI extends javax.swing.JFrame {
     private void updateTypesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateTypesButtonActionPerformed
 
         DefaultTableModel model = (DefaultTableModel) accountTypeTable.getModel();
-        ArrayList<AccountTypeItem> typeList = typeTable.getInfo();
+        List<AccountTypeItem> typeList = qf.getAccountTypes();
         model.setRowCount(0);
         for (AccountTypeItem ati : typeList) {
             model.addRow(new Object[]{ati.getName(), ati.getOwnership(), ati.getDesc(),
@@ -1598,15 +1496,16 @@ public class BrokerageUI extends javax.swing.JFrame {
         AccountTypeItem ati = new AccountTypeItem(typeName, ownership, description,
             minInvest, commission,
             maintenance, period);
-        try {
-            /* insert data into db */
-            typeTable.add(ati);
-            /* add new account type to drop down menu on opening account page */
-            selectAccountTypeBox.addItem(typeName);
-            JOptionPane.showMessageDialog(null, "Account Type Created Successfully");
-        } catch (SQLException ex) {
-            Logger.getLogger(BrokerageUI.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, ex.getMessage());
+        int val = qf.addNewAccountType(ati);
+        switch (val) {
+            case 0:
+                 /* add new account type to drop down menu on opening account page */
+                selectAccountTypeBox.addItem(typeName);
+                JOptionPane.showMessageDialog(null, "Account Type Created Successfully");
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(null, "Account Type Failure");
+                break;
         }
 
         // reset to default values
@@ -1619,10 +1518,6 @@ public class BrokerageUI extends javax.swing.JFrame {
         periodBox.setSelectedIndex(0);
     }//GEN-LAST:event_newTypeButtonActionPerformed
 
-    private void maintenanceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maintenanceTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_maintenanceTextFieldActionPerformed
-
     private void addAmountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addAmountButtonActionPerformed
         
         double amount = Double.parseDouble(amountTextField.getText());
@@ -1630,17 +1525,12 @@ public class BrokerageUI extends javax.swing.JFrame {
         double accountValue = Double.parseDouble(accountValueTextField.getText());
         int acctNo = Integer.parseInt(searchAccountTextField.getText());
         
-        /* set new cash and total value variables */
-        double newCash = cash + amount;
-        double newAccountValue = accountValue + amount;
+        Double[] newValues = qf.addCash(acctNo, amount, cash, accountValue);
         
-        AccountItem ai = new AccountItem("", newAccountValue, newCash, "", "", "");
-        accountTable.updateNumericSettings(ai, acctNo);
-        
-        /* update textfield */
+        /* update textfields */
         amountTextField.setText("");
-        cashTextField.setText(String.valueOf(newCash));
-        accountValueTextField.setText(String.valueOf(newAccountValue));
+        cashTextField.setText(String.valueOf(newValues[0]));
+        accountValueTextField.setText(String.valueOf(newValues[1]));
     }//GEN-LAST:event_addAmountButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
@@ -1661,6 +1551,33 @@ public class BrokerageUI extends javax.swing.JFrame {
         numOwnersTextField.setText("");
         
     }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void searchUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchUserButtonActionPerformed
+        DefaultTableModel model = (DefaultTableModel) userAccountTable.getModel();
+        String firstName = firstNameSearchTextField.getText();
+        String lastName = lastNameSearchTextField.getText();
+        
+        List<AccountItem> aiList = qf.getUserAccounts(firstName, lastName);
+        for (AccountItem ai: aiList) {
+            /* display on market table */
+            model.addRow(new Object[]{ai.getAcctNo(), ai.getType(), ai.getOpenDate(), ai.getCash(),
+                        ai.getTotalValue()});
+        }
+    }//GEN-LAST:event_searchUserButtonActionPerformed
+
+    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
+        DefaultTableModel model = (DefaultTableModel) userAccountTable.getModel();
+        model.setRowCount(0);
+        String firstName = firstNameSearchTextField.getText();
+        String lastName = lastNameSearchTextField.getText();
+        
+        List<AccountItem> aiList = qf.getUserAccounts(firstName, lastName);
+        for (AccountItem ai: aiList) {
+            /* display on market table */
+            model.addRow(new Object[]{ai.getAcctNo(), ai.getType(), ai.getOpenDate(), ai.getCash(),
+                        ai.getTotalValue()});
+        }
+    }//GEN-LAST:event_refreshButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1731,8 +1648,10 @@ public class BrokerageUI extends javax.swing.JFrame {
     private javax.swing.JTextField emailTextField;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JTextField firstNameSearchTextField;
     private javax.swing.JTextField firstNameTextField;
     private javax.swing.JTextField investmentTextField;
+    private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1768,6 +1687,8 @@ public class BrokerageUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
+    private javax.swing.JLabel jLabel41;
+    private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -1778,7 +1699,11 @@ public class BrokerageUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JLabel lastNameSearch;
+    private javax.swing.JTextField lastNameSearchTextField;
     private javax.swing.JTextField lastNameTextField;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JTextField maintenanceTextField;
@@ -1796,7 +1721,9 @@ public class BrokerageUI extends javax.swing.JFrame {
     private javax.swing.JTextField phoneTextField;
     private javax.swing.JPanel portfolioInfoPanel;
     private javax.swing.JPanel portfolioPanel;
+    private javax.swing.JButton refreshButton;
     private javax.swing.JTextField searchAccountTextField;
+    private javax.swing.JButton searchUserButton;
     private javax.swing.JComboBox selectAccountTypeBox;
     private javax.swing.JTextField ssnTextField;
     private javax.swing.JComboBox stateBox;
@@ -1814,10 +1741,12 @@ public class BrokerageUI extends javax.swing.JFrame {
     private javax.swing.JTextField typeTextField;
     private javax.swing.JButton updateMarketButton;
     private javax.swing.JButton updateTypesButton;
+    private javax.swing.JTable userAccountTable;
     private javax.swing.JTabbedPane viewAccountType;
     private javax.swing.JPanel viewAccountTypesPanel;
     private javax.swing.JButton viewPortfolioButton;
     private javax.swing.JButton viewPortfolioSearchButton;
+    private javax.swing.JPanel viewUserAccounts;
     private javax.swing.JTable watchListTable;
     private javax.swing.JTextField zipTextField;
     // End of variables declaration//GEN-END:variables
