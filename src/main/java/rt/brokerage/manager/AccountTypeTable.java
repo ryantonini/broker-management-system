@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,18 +23,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is used to interact with the AccountType table in the database. 
+ * Writes to and reads data from the AccountType Table in the database.
  * 
- * It provides functionality to insert tuples into the table and get tuple information 
- * from the table.
- * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class AccountTypeTable extends Table<AccountTypeItem> {
     
     public AccountTypeTable(Connection con){
@@ -61,10 +58,15 @@ public class AccountTypeTable extends Table<AccountTypeItem> {
         }       
         return 0;
     }
-    
-    public ArrayList<AccountTypeItem> getInfo() {
+   
+    /**
+     * Get info from each account type.
+     * 
+     * @return list of row items corresponding to each account type.
+     */
+    public List<AccountTypeItem> getInfo() {
         String query = "SELECT * FROM AccountType";
-        ArrayList<AccountTypeItem> typeList = new ArrayList<>();
+        List<AccountTypeItem> typeList = new ArrayList<>();
         AccountTypeItem ati = new AccountTypeItem("", "", "", 0, 0, 0, "");
         Statement stmt;
         try {
@@ -86,10 +88,15 @@ public class AccountTypeTable extends Table<AccountTypeItem> {
         } catch (SQLException ex) {
             Logger.getLogger(AccountTypeTable.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return typeList;
-        
-        
+        return typeList;  
     }
+
+    /**
+     * Get info for the account type of the account given. 
+     * 
+     * @param acctNo the account number.
+     * @return row item corresponding to the account type.
+     */
     public AccountTypeItem getInfo(int acctNo) {
         String query = "SELECT * FROM AccountType WHERE name in (SELECT type FROM " +
         "Account WHERE acctNo = ?)";
