@@ -15,40 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
+
 
 /**
  * This class contains the parameters corresponding to the attributes of Quote
  * Table. It enables the user to set and get values for these parameters.  This 
  * class is used primarily in conjunction with the QuoteTable class.
  * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class QuoteItem {
     
     private String ticker;
-    private String name;
+    private String exchange;
     private double lastTrade;
     private String tradeTime;
     private String tradeDate;
     private double change;
-    private double open;
+    private double percentChange;
     private double prevClose;
-    private int volume;
 
-    public QuoteItem(String ticker, String name, double lastTrade, String tradeTime,
-                     String tradeDate, double change, double open, double prevClose, 
-                     int volume) {
+    public QuoteItem(String ticker, String exchange, double lastTrade, String tradeTime,
+                     String tradeDate, double change, double percentChange, double prevClose) {
         this.ticker = ticker;
-        this.name = name;
+        this.exchange = exchange;
         this.lastTrade = lastTrade;
         this.tradeTime = tradeTime;
         this.tradeDate = tradeDate;
         this.change = change;
-        this.open = open;
+        this.percentChange = percentChange;
         this.prevClose = prevClose;
-        this.volume = volume;
     }
 
     public String getTradeDate() {
@@ -59,12 +56,20 @@ public class QuoteItem {
         this.tradeDate = tradeDate;
     }
 
-    public String getName() {
-        return name;
+    public String getExchange() {
+        return exchange;
+    }
+
+    public double getPercentChange() {
+        return percentChange;
+    }
+
+    public void setPercentChange(double percentChange) {
+        this.percentChange = percentChange;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.exchange = name;
     }
 
     public String getTradeTime() {
@@ -107,19 +112,4 @@ public class QuoteItem {
         this.lastTrade = lastTrade;
     }
 
-    public double getOpen() {
-        return open;
-    }
-
-    public void setOpen(double open) {
-        this.open = open;
-    }
-
-    public int getVolume() {
-        return volume;
-    }
-
-    public void setVolume(int volume) {
-        this.volume = volume;
-    } 
 }
