@@ -17,73 +17,78 @@
 
 package rt.brokerage.quote;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import rt.brokerage.main.QuoteItem;
+import java.util.HashMap;
+import java.util.Map;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import rt.brokerage.manager.QuoteItem;
 
 /**
- * @author ryantonini
+ * This class is used to find stock quotes.
+ * 
+ * The GOOGLE Finance API is used to get quote data.  The quote data is not
+ * real time, but is updated at frequent intervals (approximately every min).
+ * 
+ * @author Ryan Tonini
  */
 public class StockLookup {
     
     /**
-     * Gets the stock quote for the ticker symbol in the arguments of the method 
-     * from YahooFinance.
+     * Gets the stock quote for the ticker symbol.
      * 
      * @param symbol the stock symbol to get the quote for
      * @return the stock quote for the symbol.  The quote returned includes the 
-     *         company name, last trade,trade time, date, change, open, previous
-     *         close and volume. 
+     *         ticker, exchange, last trade, trade time, date, change, percent change,
+     *         previous close.
      */
     public QuoteItem getStockInfo(String symbol) {        
-        QuoteItem stockInfo = null;
+        QuoteItem quote = null;
+        String url = renderUrl(symbol);
+        Document doc;
         try {
-            URL yahooFinance;
-            yahooFinance = new URL("http://finance.yahoo.com/d/quotes.csv?s=" + symbol + "&f=nl1t1c1opv");
-            URLConnection yc = yahooFinance.openConnection();
-            BufferedReader input = new BufferedReader(new InputStreamReader(yc.getInputStream()));
-            String inputLine;
-            while ((inputLine = input.readLine()) != null) {
-                inputLine = inputLine.replaceAll(", ", " ");
-                String[] yahooStockInfo = inputLine.split(",");
-                String name = yahooStockInfo[0].replace("\"", "");
-                double lastTrade = Double.parseDouble(yahooStockInfo[1]);
-                String tradeTime = yahooStockInfo[2].replace("\"", "");
-                double change = Double.parseDouble(yahooStockInfo[3]);
-                double open = Double.parseDouble(yahooStockInfo[4]);
-                double prevClose = Double.parseDouble(yahooStockInfo[5]);
-                int volume = Integer.parseInt(yahooStockInfo[6]);
-                Date date = new Date( );
-                // same as sql date format
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
-                String tradeDate = sdf.format(date);
-                stockInfo = new QuoteItem(symbol, name, lastTrade, tradeTime, 
-                                    tradeDate, change, open, prevClose, volume);
-                break;
+            doc = Jsoup.connect(url).get();
+            String text = doc.body().text();
+            int firstIndex = text.indexOf("{");
+            int secondIndex = text.indexOf("}");
+            String[] values = text.substring(firstIndex+2, secondIndex).split(",");
+            Map<String,String> map = new HashMap<>();   
+        
+            for(String attr: values){
+                /* split the pairs to get key and value */
+                String[] entry = attr.split(":", 2); 
+                /* add them to the hashmap and trim whitespaces/quotations */
+                map.put(entry[0].trim().replace("\"", ""), entry[1].trim().replace("\"", "")); 
             }
-            input.close();
-        } catch (IOException | NumberFormatException ex) {
-            System.err.println("Unable to get stockinfo for: " + symbol);
-            System.err.println(ex.getMessage());
+            Date date = new Date( );
+            /* same as sql date format */
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+            String tradeDate = sdf.format(date);
+            quote = new QuoteItem(map.get("t"), map.get("e"), Double.parseDouble(map.get("l")), 
+                                map.get("ltt"), tradeDate, Double.parseDouble(map.get("c")), 
+                                Double.parseDouble(map.get("cp")), 
+                                Double.parseDouble(map.get("pcls_fix")));
+        } catch (IOException e) {
+            e.getMessage();
         }
-        return stockInfo;
-     }
+        return quote;
+    }
     
+    private String renderUrl(String ticker) {
+        String quoteURL = String.format("http://finance.google.com/finance/info?client=ig&q=%s", 
+                                        ticker);
+        return quoteURL;
+    }
+
     public static void main(String[] args){
-        StockLookup sq = new StockLookup();
-        QuoteItem qi = sq.getStockInfo("FB");
-        System.out.println(qi.getLastTrade());
-        System.out.println(qi.getPrevClose());
-        System.out.println(qi.getName());
-        System.out.println(qi.getTicker());
-        System.out.println(qi.getTradeTime());
-        System.out.println(qi.getVolume());
+        StockLookup sl = new StockLookup();
+        QuoteItem qi = sl.getStockInfo("IBM");
+        String quoteRepr = String.format("%f, %s, %f, %f, %s, %s", qi.getChange(), 
+                          qi.getExchange(), qi.getPercentChange(), qi.getLastTrade(), 
+                          qi.getTradeDate(), qi.getTradeTime());
+        System.out.println(quoteRepr);
     }
     
 }
