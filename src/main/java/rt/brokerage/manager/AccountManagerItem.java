@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 /**
  * This class contains the parameters corresponding to the attributes of 
- * AccountManager Table. It enables the user to set and get values for these 
- * parameters.  This class is used primarily in conjunction with the 
- * AccountManagerTable class.
+ * AccountManager Table. 
  * 
- * @author ryantonini
+ * It enables the user to set and get values for these parameters.  This class 
+ * is used primarily in conjunction with the AccountManagerTable class.
+ * 
+ * @author Ryan Tonini
  */
-
 public class AccountManagerItem {
     
     private int acctNo;
