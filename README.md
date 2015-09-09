@@ -1,7 +1,7 @@
 Broker Management System
 ========
 
-A simple broker management system built from the Java Swing framework.  The system provides tools for the individual broker to manage client and account details, perform client transactions, view market data, monitor client portfolios, and other key functionalities.  
+A simple broker management system built from the Java Swing framework.  The system provides tools for the individual broker to manage client and account details, perform client transactions, view market data, monitor client portfolios, and other key functionalities.  The application can also be treated as a stock simulator that mimics the behaviour of an account under a real brokerage.   
 
 Getting Started
 ------------
