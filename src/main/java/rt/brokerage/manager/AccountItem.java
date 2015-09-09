@@ -31,7 +31,7 @@ public class AccountItem {
     private int acctNo;
     private String type;
     private double totalValue; // cash + investment value
-    private double cash; // money that can be used to buy etc.
+    private double cash; // money that can be used to buy stock.
     private String status; // either 'open' or 'closed' account
     private String openDate;
     private String closeDate;
