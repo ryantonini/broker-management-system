@@ -15,35 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Base table.  
+ * Base class for all table implementations.  Each table will use a specific
+ * row item object corresponding to its own schema.
  * 
- * @author ryantonini
- * @param <T> parameters for the specific table
+ * @author Ryan Tonini
+ * @param <T> row item for the specific table
  */
 public abstract class Table<T> {
     
     protected Connection con;
     
-    /**
-     * @param con connection to the database
-     */
     public Table(Connection con) {
         this.con = con;
     }
-    
+   
     /**
-     * Add tuple to table.
+     * Add the row item to the database.
      * 
-     * @param t tuple to be added
-     * @return either 0 or last auto_increment value
-     * @throws SQLException
+     * The table to which the row item is added will depend on the class from 
+     * which the method is called.
+     * 
+     * @param t the row item to be inserted into the database
+     * @return an integer value.  For most implementations of table, the value 
+     *         returned is 0.  In this case, the value has no significance.  For 
+     *         the Account Table, the value returned is the account number, which 
+     *         is useful when performing other queries.
+     * @throws SQLException if the info is not successfully inserted into the
+     *         database.
      */
     public abstract int add(T t) throws SQLException;
-    
 }
+
