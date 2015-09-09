@@ -19,6 +19,11 @@
         <type>jar</type>
         <scope>compile</scope>
     </dependency>
+    <dependency>
+	<groupId>org.jsoup</groupId>
+	<artifactId>jsoup</artifactId>
+	<version>1.8.1</version>
+    </dependency>
 </dependencies>
 
 <build>
