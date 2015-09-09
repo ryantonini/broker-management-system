@@ -15,18 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 /**
  * This class contains the parameters corresponding to the attributes of Account
- * Table. It enables the user to set and get values for these parameters.  This 
+ * Table. 
+ * 
+ * It enables the user to set and get values for these parameters.  This 
  * class is used primarily in conjunction with the AccountTable class. 
  * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class AccountItem {
     
+    private int acctNo;
     private String type;
     private double totalValue; // cash + investment value
     private double cash; // money that can be used to buy etc.
@@ -44,6 +46,15 @@ public class AccountItem {
         this.closeDate = closeDate;
     }
 
+    public int getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(int acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    
     public String getType() {
         return type;
     }
