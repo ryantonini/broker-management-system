@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,11 +24,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is used to interact with the Transaction table in the database.
+ * Writes data to the Transaction Table in the database.
  * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class TransactionTable extends Table<TransactionItem> {
     
     public TransactionTable(Connection con){
@@ -39,8 +38,7 @@ public class TransactionTable extends Table<TransactionItem> {
     public int add(TransactionItem ti) throws SQLException {
         String query = 
         "INSERT INTO Transaction(acctNo, ticker, type, qty, price, date) " +
-        "Values(?, ?, ?, ?, ?, ?)";
-        
+        "Values(?, ?, ?, ?, ?, ?)";       
         try (PreparedStatement preparedStmt = con.prepareStatement(query)) {
             preparedStmt.setInt(1, ti.getAcctNo());
             preparedStmt.setString(2, ti.getTicker());
