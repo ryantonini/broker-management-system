@@ -15,20 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is used to interact with the AccountManager table in the database.
+ * Writes to and reads data from the AccountManager Table in the database. 
  * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class AccountManagerTable extends Table<AccountManagerItem>{
     
     public AccountManagerTable(Connection con){
@@ -47,5 +49,32 @@ public class AccountManagerTable extends Table<AccountManagerItem>{
             Logger.getLogger(AccountManagerTable.class.getName()).log(Level.SEVERE, null, e);
         }     
         return 0;
-    }  
+    }
+   
+    /**
+     * Find all the accounts of the given client.  
+     * 
+     * @param cID the client id. 
+     * @return list of account numbers. 
+     */
+    public List<Integer> findUserAccounts(int cID) {
+        String query = "SELECT * FROM AccountManager WHERE cID = ?";
+        List<Integer> idList = new ArrayList<>();
+        PreparedStatement preparedStmt;
+        
+        try  {
+            preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt(1, cID);
+            ResultSet rs = preparedStmt.executeQuery();
+            while(rs.next()){
+                //Retrieve by column name
+                idList.add(rs.getInt("acctNo"));
+            }
+            rs.close();
+            preparedStmt.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(AccountTable.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return idList;
+    }
 }
