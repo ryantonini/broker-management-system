@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 /**
  * This class contains the parameters corresponding to the attributes of 
@@ -23,9 +23,8 @@ package rt.brokerage.main;
  * parameters.  This class is used primarily in conjunction with the 
  * TransactionTable class.
  * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class TransactionItem {
    
     private int acctNo;
