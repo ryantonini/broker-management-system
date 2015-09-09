@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,37 +23,35 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is used to interact with the Quote table in the database.
+ * Writes to and reads data from the Quote Table in the database.
  * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class QuoteTable extends Table<QuoteItem> {
     
     public QuoteTable(Connection con){
         super(con);
     }
-
+    
     @Override
     public int add(QuoteItem qi) throws SQLException {
         String query = 
-        "INSERT INTO Quote(ticker, name, last_trade, time, date, " + 
-        "chng, open_val, prev_close, volume) Values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+        "INSERT INTO Quote(ticker, exchange, last_trade, time, date, " + 
+        "chng, percent_chng, prev_close) Values(?, ?, ?, ?, ?, ?, ?, ?)";      
         try (PreparedStatement preparedStmt = con.prepareStatement(query)) {
             preparedStmt.setString(1, qi.getTicker());
-            preparedStmt.setString(2, qi.getName());
+            preparedStmt.setString(2, qi.getExchange());
             preparedStmt.setDouble(3, qi.getLastTrade());
             preparedStmt.setString(4, qi.getTradeTime());
             preparedStmt.setString(5, qi.getTradeDate());
             preparedStmt.setDouble(6, qi.getChange());
-            preparedStmt.setDouble(7, qi.getOpen());
+            preparedStmt.setDouble(7, qi.getPercentChange());
             preparedStmt.setDouble(8, qi.getPrevClose());
-            preparedStmt.setInt(9, qi.getVolume());
             preparedStmt.executeUpdate();
         } catch (SQLException e) {
             Logger.getLogger(QuoteTable.class.getName()).log(Level.SEVERE, null, e);
@@ -61,20 +59,26 @@ public class QuoteTable extends Table<QuoteItem> {
         return 0;
     }
     
+    /**
+     * Update the stock quote for the given ticker.
+     * 
+     * @param qi the updated stock quote.  The stock quote contains the ticker symbol,
+     *        last trade, trade time, trade date, change, percent change, and
+     *        previous close.
+     * @throws java.sql.SQLException if the SQL query doesn't execute successfully.
+     */
     public void update(QuoteItem qi) throws SQLException {
         String query = 
-        "UPDATE Quote SET last_trade = ?, time = ?, date = ?, chng = ?, open_val = ?, " +
-        "prev_close = ?, volume = ? WHERE ticker = ?";
-        
+        "UPDATE Quote SET last_trade = ?, time = ?, date = ?, chng = ?, percent_chng = ?, " +
+        "prev_close = ? WHERE ticker = ?";     
         try (PreparedStatement preparedStmt = con.prepareStatement(query)) {
             preparedStmt.setDouble(1, qi.getLastTrade());
             preparedStmt.setString(2, qi.getTradeTime());
             preparedStmt.setString(3, qi.getTradeDate());
             preparedStmt.setDouble(4, qi.getChange());
-            preparedStmt.setDouble(5, qi.getOpen());
+            preparedStmt.setDouble(5, qi.getPercentChange());
             preparedStmt.setDouble(6, qi.getPrevClose());
-            preparedStmt.setDouble(7, qi.getVolume());
-            preparedStmt.setString(8, qi.getTicker());
+            preparedStmt.setString(7, qi.getTicker());
             preparedStmt.executeUpdate();
         } catch (SQLException e) {
             Logger.getLogger(QuoteTable.class.getName()).log(Level.SEVERE, null, e);
@@ -82,12 +86,13 @@ public class QuoteTable extends Table<QuoteItem> {
     }
     
     /**
-     *
-     * @return
+     * Get the list of ticker symbols in the database. 
+     * 
+     * @return list of ticker symbols.
      */
-    public ArrayList<String> getTickers() {       
+    public List<String> getTickers() {       
         String query = "SELECT ticker FROM quote";
-        ArrayList<String> tickerList = new ArrayList<>();
+        List<String> tickerList = new ArrayList<>();
         Statement stmt;
         try {
             stmt = con.createStatement();
