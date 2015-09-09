@@ -15,25 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is used to interact with the Client table in the database.
+ * Writes to and reads data from the Client Table in the database.
  * 
- * Provides functionality to add client records to the table and to get 
- * records from the table.
- * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class ClientTable extends Table<ClientItem>{
     
     public ClientTable(Connection con){
@@ -71,10 +68,16 @@ public class ClientTable extends Table<ClientItem>{
         return clientID;
     }
     
-    public ArrayList<ClientItem> getInfo(int acctNo) {
+    /**
+     * Get all the members for the given account number.  
+     * 
+     * @param acctNo the account number.
+     * @return list of row items corresponding to each account member.
+     */
+    public List<ClientItem> getInfo(int acctNo) {
         String query = "SELECT * FROM Client WHERE cID in " +
         "(SELECT cID FROM AccountManager WHERE acctNo = ?)";       
-        ArrayList<ClientItem> clients = new ArrayList<>();       
+        List<ClientItem> clients = new ArrayList<>();       
         PreparedStatement preparedStmt;
         try {
             preparedStmt = con.prepareStatement(query);
@@ -103,4 +106,35 @@ public class ClientTable extends Table<ClientItem>{
         }
         return clients;     
     }
+    
+    /**
+     * Get the client id given the first name and last name of the client.
+     * 
+     * @param firstName the first name of the client.
+     * @param lastName the last name of the client.
+     * @return the client id.
+     */
+    public int getClientID(String firstName, String lastName){
+        String query = "SELECT * FROM Client WHERE first_name = ? and last_name = ?";
+        PreparedStatement preparedStmt;
+        int clientID = 0;
+        try  {
+            preparedStmt = con.prepareStatement(query);
+            preparedStmt.setString(1, firstName);
+            preparedStmt.setString(2, lastName);
+            ResultSet rs = preparedStmt.executeQuery();
+            while (rs.next()){
+                //Retrieve by column name
+                clientID = rs.getInt("cID");
+                break;
+            }
+            rs.close();
+            preparedStmt.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(AccountTable.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return clientID;
+    }
+        
 }
+
