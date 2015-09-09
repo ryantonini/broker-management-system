@@ -15,23 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import rt.brokerage.quote.StockLookup;
 
 /**
- * This class is used to interact with the Portfolio table in the database.
+ * Writes to and reads data from the Portfolio Table in the database.
  * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class PortfolioTable extends Table<PortfolioItem> {
     
     public PortfolioTable(Connection con){
@@ -59,11 +59,17 @@ public class PortfolioTable extends Table<PortfolioItem> {
         return 0;
     }
     
+    /**
+     * Update the asset in the portfolio table with the info provided.
+     * 
+     * In this context, asset refers to any item in the account portfolio.
+     * 
+     * @param pi the updated portfolio asset. 
+     */
     public void update(PortfolioItem pi) {
         String query = 
         "UPDATE Portfolio SET qty = ?, current_price = ?, total_value = ?, net = ? " +
         "WHERE ticker = ? and acctNo = ?";
-        
         try (PreparedStatement preparedStmt = con.prepareStatement(query)){
             preparedStmt.setInt(1, pi.getQty());
             preparedStmt.setDouble(2, pi.getCurrentPrice());
@@ -77,6 +83,13 @@ public class PortfolioTable extends Table<PortfolioItem> {
         }   
     }
    
+    /**
+     * Get info about the stock asset for the given ticker and account number. 
+     * 
+     * @param accountNumber the account number.
+     * @param symbol the ticker symbol.
+     * @return the row item corresponding to the asset in the account portfolio.
+     */
     public PortfolioItem getInfo(int accountNumber, String symbol) {
         String query = 
         "SELECT * FROM Portfolio WHERE acctNo = ? and ticker = ?";
@@ -106,9 +119,11 @@ public class PortfolioTable extends Table<PortfolioItem> {
     }
     
     /**
-     *
-     * @param accountNumber
-     * @param symbol
+     * Delete the tuple in the portfolio table with the given account number and
+     * ticker symbol.
+     * 
+     * @param accountNumber the account number.
+     * @param symbol the ticker symbol.
      */
     public void delete(int accountNumber, String symbol) {
         String query = "DELETE FROM Portfolio WHERE acctNo = ? and ticker = ?";
@@ -121,10 +136,20 @@ public class PortfolioTable extends Table<PortfolioItem> {
         }
     }
     
-    public ArrayList<PortfolioItem> updateAll(int acctNo) {
+    /**
+     * Update all the assets in the portfolio table owned under the account 
+     * number specified.  
+     * 
+     * In this context, asset refers to any item in the account portfolio.
+     * 
+     * @param acctNo the account number.
+     * @return list of row items corresponding to the updated assets of the 
+     *         account.
+     */
+    public List<PortfolioItem> updateAll(int acctNo) {
         String query = "SELECT * FROM Portfolio WHERE acctNo = ?";
         StockLookup lookup = new StockLookup();
-        ArrayList<PortfolioItem> piList = new ArrayList<>();
+        List<PortfolioItem> piList = new ArrayList<>();
         PreparedStatement preparedStmt;
             
         try {
