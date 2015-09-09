@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package rt.brokerage.main;
+package rt.brokerage.manager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,14 +25,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is used to interact with the Account table in the database.
+ * Writes to and reads data from the Account Table in the database.
  * 
- * It provides functionality to add tuples to the table, update tuple information,
- * and get tuples from the table.
- * 
- * @author ryantonini
+ * @author Ryan Tonini
  */
-
 public class AccountTable extends Table<AccountItem> {
     
     public AccountTable(Connection con){
@@ -64,11 +60,17 @@ public class AccountTable extends Table<AccountItem> {
         return acctNo;
     }
     
+    /**
+     * Update the numeric settings (cash and total value) of the given
+     * account.
+     * 
+     * @param ai the new account information. 
+     * @param acctNo the account number of the account to be updated. 
+     */
     public void updateNumericSettings(AccountItem ai, int acctNo) {
         String query =
         "UPDATE Account SET total_value = ?, cash = ? " +
-        "WHERE acctNo = ?";
-        
+        "WHERE acctNo = ?";      
         try (PreparedStatement preparedStmt = con.prepareStatement(query)) {
             preparedStmt.setDouble(1, ai.getTotalValue());
             preparedStmt.setDouble(2, ai.getCash());
@@ -76,15 +78,19 @@ public class AccountTable extends Table<AccountItem> {
             preparedStmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(AccountTable.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        }   
     }
-    
+    /**
+     * Update the date settings (status and close date) of the given
+     * account.
+     * 
+     * @param ai the new account information. 
+     * @param acctNo the account number of the account to be updated. 
+     */
     public void updateDateSettings(AccountItem ai, int acctNo) {
         String query = 
         "UPDATE Account SET status = ?, close_date = ? " +
-        "WHERE acctNo = ?";
-        
+        "WHERE acctNo = ?";       
         try (PreparedStatement preparedStmt = con.prepareStatement(query)) {
             preparedStmt.setString(1, ai.getStatus());
             preparedStmt.setString(2, ai.getCloseDate());
@@ -95,13 +101,20 @@ public class AccountTable extends Table<AccountItem> {
         }
     }
     
-    public AccountItem getInfo(int accountNumber) {
+    /**
+     * Get info for the given account.  
+     * 
+     * @param acctNo the account number of the account to get info from.
+     * @return the account information.  It includes account type, total value,
+     *         cash, status, open date, and close date.
+     */
+    public AccountItem getInfo(int acctNo) {
         String query = "SELECT * FROM Account WHERE acctNo = ?";
         AccountItem ai = new AccountItem("", 0, 0, "", "", "");
         PreparedStatement preparedStmt;
         try {
             preparedStmt = con.prepareStatement(query);
-            preparedStmt.setInt(1, accountNumber);
+            preparedStmt.setInt(1, acctNo);
             ResultSet rs = preparedStmt.executeQuery();
             while(rs.next()){
                 //Retrieve by column name
@@ -119,7 +132,7 @@ public class AccountTable extends Table<AccountItem> {
             Logger.getLogger(AccountTable.class.getName()).log(Level.SEVERE, null, ex);
         }
         return ai;
-    } 
+    }
 }
 
 
