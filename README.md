@@ -10,7 +10,7 @@ Getting Started
 
 * Java 1.7
 * MySQL (Community Server)
-* Maven 3.3.3 (alternatively you could use Netbeans IDE, Eclipse or IntelliJ)
+* Maven 3.3.3 (alternatively you could use an IDE like Netbeans, Eclipse or IntelliJ)
 
 Clone the repository to your system locally via ``git clone``:
 
